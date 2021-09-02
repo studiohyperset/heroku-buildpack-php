@@ -9,6 +9,7 @@ use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
 use Composer\Package\PackageInterface;
+use Composer\Util\Filesystem;
 
 class ComposerInstallerPlugin implements PluginInterface, EventSubscriberInterface
 {
@@ -40,16 +41,31 @@ class ComposerInstallerPlugin implements PluginInterface, EventSubscriberInterfa
 			}
 		}
 		
+		$loop = $composer->getLoop();
+		$process = $loop->getProcessExecutor();
 		$composer->getDownloadManager()->setDownloader(
 			'heroku-sys-tar',
 			new Downloader(
 				$io,
 				$composer->getConfig(),
-				$composer->getEventDispatcher()
-				// no cache passed in as we explicitly don't want one; inside the slug it makes no sense, as slugs are immutable, and outside the slug (in the app's build cache), it makes little difference (packages are on S3, the cache is on S3) performance wise but would massively bloat the cache size and thus storage cost
+				$loop->getHttpDownloader(),
+				$composer->getEventDispatcher(),
+				null, // no cache passed in as we explicitly don't want one; inside the slug it makes no sense, as slugs are immutable, and outside the slug (in the app's build cache), it makes little difference (packages are on S3, the cache is on S3) performance wise but would massively bloat the cache size and thus storage cost
+				new Filesystem($process),
+				$process
 			)
 		);
 		$composer->getInstallationManager()->addInstaller(new ComposerInstaller($io, $composer));
+	}
+	
+	public function deactivate(Composer $composer, IOInterface $io)
+	{
+		// TODO: can we implement anything here?
+	}
+	
+	public function uninstall(Composer $composer, IOInterface $io)
+	{
+		// TODO: can we implement anything here?
 	}
 	
 	public static function getSubscribedEvents()
@@ -81,6 +97,7 @@ class ComposerInstallerPlugin implements PluginInterface, EventSubscriberInterfa
 		}
 	}
 	
+	// FIXME: this can go once we've moved to "dummy" packages for bundled extensions
 	protected function initAllPlatformRequirements(array $operations)
 	{
 		if($this->allPlatformRequirements !== null) return;
@@ -105,6 +122,7 @@ class ComposerInstallerPlugin implements PluginInterface, EventSubscriberInterfa
 		}
 	}
 	
+	// FIXME: this can go once we've moved to "dummy" packages for bundled extensions
 	protected function enableReplaces(PackageInterface $package)
 	{
 		// the current package may be "replace"ing any of the packages (e.g. ext-bcmath is bundled with PHP) that are required by another package
