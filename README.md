@@ -16,10 +16,12 @@ It uses Composer for dependency management, supports PHP or HHVM (experimental) 
     `git remote add upstream https://github.com/snowflakedb/pdo_snowflake.git`
 2. Fetch all branches of remote upstream
     `git fetch upstream`
-3. Rewrite your master with latest tag version
-    `git rebase upstream/main`
+3. Squash master from upstream into current one
+    `git reset --soft upstream/main`
+    `git commit -m "new version"`
+    `git push -f`
 4. Sync changes to retrieve the new data. Check if bin/snowflake.sh is in place. If PHP version changed, need to change the extension name dir to reflect the PHP API version. You may retrieve the PHP API version with the command `php -i | grep 'PHP API'`
-5. Add the followin code to `bin/compile` just above the row `status "Preparing runtime environment..."`
+5. Add the following code to `bin/compile` just above the row `status "Preparing runtime environment..."`
     `# snowflake
     source $bp_dir/bin/snowflake.sh`
 6. Add the following lines to `conf/php/php.ini`
