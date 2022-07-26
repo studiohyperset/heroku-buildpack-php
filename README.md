@@ -10,12 +10,14 @@ It uses Composer for dependency management, supports PHP or HHVM (experimental) 
 2. You may need to edit the file `bin/snowflake.sh` and adjust the extension folder address of your setup. `phpinfo()` or `php -i | grep 'PHP API'` will tell you the correct folder name, which is the PHP API version. The current version is set for PHP 8.0.
 
 
-## Update process
+
+### Updating PHP Buildpack
 
 1. Add the original repo as "upstream":
-    `git remote add upstream https://github.com/snowflakedb/pdo_snowflake.git`
+    `git remote add upstream https://github.com/heroku/heroku-buildpack-php.git`
 2. Fetch all branches of remote upstream
     `git fetch upstream`
+3. Rewrite your master with latest tag version
 3. Squash master from upstream into current one
     `git reset --soft upstream/main`
     `git commit -m "new version"`
@@ -29,15 +31,3 @@ It uses Composer for dependency management, supports PHP or HHVM (experimental) 
     pdo_snowflake.cacert=cacert.pem`
 7. Update `conf/php/cacert.pem` with content from `https://github.com/gisle/mozilla-ca/blob/master/lib/Mozilla/CA/cacert.pem`
 8. Commit and push to main
-
-
-### Updating PHP Buildpack
-
-1. Add the original repo as "phpupstream":
-    `git remote add phpupstream https://github.com/heroku/heroku-buildpack-php.git`
-2. Fetch all branches of remote phpupstream
-    `git fetch phpupstream`
-3. Rewrite your master with latest tag version
-    `git rebase phpupstream/main`
-4. Sync changes to retrieve the new data. 
-5. Commit and push to main
