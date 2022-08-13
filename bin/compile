@@ -724,7 +724,7 @@ if cat "$COMPOSER" | python -c 'import sys,json; sys.exit("compile" not in json.
 fi
 
 # snowflake
-source $bp_dir/bin/snowflake.sh
+# source $bp_dir/bin/snowflake.sh
 
 status "Preparing runtime environment..."
 
